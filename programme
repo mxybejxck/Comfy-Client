@@ -1,0 +1,137 @@
+using System;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Runtime.InteropServices;
+
+class Program
+{
+    [DllImport("user32.dll")]
+    private static extern short GetAsyncKeyState(Keys vKey);
+
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
+
+        Timer timer = new Timer();
+        timer.Interval = 100; // Check every 100ms
+        timer.Tick += (sender, e) =>
+        {
+            if ((GetAsyncKeyState(Keys.LShiftKey) & 0x8000) != 0) // Check if Left Shift is pressed
+            {
+                ShowUI();
+            }
+        };
+        timer.Start();
+
+        Application.Run();
+    }
+
+    static void ShowUI()
+    {
+        Form uiForm = new Form
+        {
+            Text = "Comfy Client UI",
+            Width = 1000,
+            Height = 700,
+            BackColor = Color.Black,
+            ForeColor = Color.White,
+            StartPosition = FormStartPosition.CenterScreen
+        };
+
+        // Add panels for categories
+        string[] categories = { "CRYSTAL", "COMBAT", "MISC", "SMP", "RENDER", "CLIENT", "SEARCH" };
+        int panelWidth = 150;
+        int panelHeight = 500;
+        int panelSpacing = 10;
+        int startX = 10;
+        int startY = 10;
+
+        foreach (var category in categories)
+        {
+            Panel panel = new Panel
+            {
+                Width = panelWidth,
+                Height = panelHeight,
+                BackColor = Color.FromArgb(30, 30, 30),
+                Location = new Point(startX, startY),
+                BorderStyle = BorderStyle.FixedSingle
+            };
+
+            Label label = new Label
+            {
+                Text = category,
+                ForeColor = Color.White,
+                Font = new Font("Arial", 10, FontStyle.Bold),
+                Dock = DockStyle.Top,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Height = 30
+            };
+
+            panel.Controls.Add(label);
+
+            // Add toggle switches (example)
+            for (int i = 0; i < 10; i++)
+            {
+                CheckBox toggle = new CheckBox
+                {
+                    Text = $"Option {i + 1}",
+                    ForeColor = Color.White,
+                    BackColor = Color.FromArgb(30, 30, 30),
+                    Location = new Point(10, 40 + (i * 30)),
+                    Width = 130
+                };
+                panel.Controls.Add(toggle);
+            }
+
+            uiForm.Controls.Add(panel);
+            startX += panelWidth + panelSpacing;
+        }
+
+        // Add search bar
+        TextBox searchBox = new TextBox
+        {
+            PlaceholderText = "Search modules...",
+            Width = 200,
+            Location = new Point(startX, startY),
+            BackColor = Color.FromArgb(50, 50, 50),
+            ForeColor = Color.White
+        };
+        uiForm.Controls.Add(searchBox);
+
+        // Add bottom buttons
+        Button singlePlayerButton = new Button
+        {
+            Text = "Singleplayer",
+            Width = 100,
+            Location = new Point(10, panelHeight + 20),
+            BackColor = Color.Gray,
+            ForeColor = Color.White
+        };
+        uiForm.Controls.Add(singlePlayerButton);
+
+        Button multiPlayerButton = new Button
+        {
+            Text = "Multiplayer",
+            Width = 100,
+            Location = new Point(120, panelHeight + 20),
+            BackColor = Color.Gray,
+            ForeColor = Color.White
+        };
+        uiForm.Controls.Add(multiPlayerButton);
+
+        Button optionsButton = new Button
+        {
+            Text = "Options...",
+            Width = 100,
+            Location = new Point(230, panelHeight + 20),
+            BackColor = Color.Gray,
+            ForeColor = Color.White
+        };
+        uiForm.Controls.Add(optionsButton);
+
+        // Show the form
+        uiForm.ShowDialog();
+    }
+}
